@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         btnPausa = findViewById(R.id.btnPausa);*/
         initCliente();
         //--------------------
-        /*btnR.setOnClickListener(
+        /*btnUp.setOnClickListener(
                 (v)->{
                     String x = coordX.getText().toString();
                     String y = coordY.getText().toString();
