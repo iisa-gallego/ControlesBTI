@@ -33,7 +33,6 @@ public class TCPSingleton {
     //unica variable socket
     private Socket socket;
 
-    @Override
     public void run(){
         new Thread(
                 ()->{
