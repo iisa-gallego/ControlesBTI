@@ -31,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
     int x,y;
     int posX, posY;
     boolean buttonPressed;
-    TCPSingleton tcp;
+    private TCPSingleton tcp;
+    private Button enviarBtn;
 
 
     @Override
@@ -43,34 +44,15 @@ public class MainActivity extends AppCompatActivity {
         btnBala = findViewById(R.id.btnBala);
         btnUp = findViewById(R.id.btnUp);
         btnDown = findViewById(R.id.btnDown);
-        btnUp = findViewById(R.id.btnUp);
+       // btnMenu = findViewById(R.id.btnMenu);
         btnIzq = findViewById(R.id.btnIzq);
         btnDer = findViewById(R.id.btnDer);
 
         tcp = TCPSingleton.getInstance();
+        tcp.start();
 
     }
 
-
-    public void EnviarMensaje(String msj){
-        new Thread(
-                ()->{
-
-                    try{
-                       /* OutputStream os = socket.getOutputStream();
-                        OutputStreamWriter osw = new OutputStreamWriter(os);
-                        BufferedWriter writer = new BufferedWriter(osw);*/
-
-                        writer.write(msj + "\n");
-                        writer.flush();
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-        ).start();
-
-    }
     public boolean onTouch(View view, MotionEvent event) {
 
         switch (event.getAction()){
@@ -131,5 +113,15 @@ public class MainActivity extends AppCompatActivity {
         return false;
 
     }
+
+
+   /* public void onClick(View v){
+        switch ((v.getId())){
+            case R.id.enviar:
+                tcp.enviar(json);
+
+                break;
+        }
+    }*/
 
 }

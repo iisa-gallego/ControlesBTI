@@ -11,7 +11,7 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class TCPSingleton {
+public class TCPSingleton extends Thread {
 
     private static TCPSingleton unicainstancia;
 
@@ -33,40 +33,40 @@ public class TCPSingleton {
     //unica variable socket
     private Socket socket;
 
+@Override
     public void run(){
-        new Thread(
-                ()->{
-                    try{
-                        //para solicitar la conexión
-                        Socket socket = new Socket("192.168.1.106", 5000);
+        try{
+            //Log.e(">>","Esperando conexion");
+            socket= new Socket("192.168.1.106",6000);
+            //para cuando conecte
+            //Log.e(">>","Conectado");
 
-                        //cliente y server conectados
-                        System.out.println("Conexión exitosa");
 
-                        InputStream is = socket.getInputStream();
-                        InputStreamReader isr = new InputStreamReader(is);
-                        reader = new BufferedReader(isr);
+            //Input Output
+            InputStream is=socket.getInputStream();
+            OutputStream os= socket.getOutputStream();
 
-                        OutputStream os = socket.getOutputStream();
-                        OutputStreamWriter osw = new OutputStreamWriter(os);
-                        writer = new BufferedWriter(osw);
 
-                        while(true) {
-                            System.out.println("Esperando...");
-                            String line = reader.readLine();
-                            System.out.println("Recibido");
-                            System.out.println("Recibido: " + line);
 
-                        }
+            //Writer reader
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            writer=new BufferedWriter(new OutputStreamWriter(os));
 
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-        ).start();
+
+
+            //Recepción mensaje
+            while(true) {
+                String line = reader.readLine();
+                Log.e(">>",line);
+            }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
+
 
     public void enviar(String mensaje){
 
@@ -86,5 +86,17 @@ public class TCPSingleton {
         ).start();
 
     }
+    /*public void enviarMsj(String msj){
+        new Thread(
+                ()->{
+                     try{
+                       writer.write(msj + "\n");
+                        writer.flush();
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+                }
+                ).start();
 
+                    }*/
 }
