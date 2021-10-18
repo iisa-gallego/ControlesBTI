@@ -4,8 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.system.Os;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,6 +28,10 @@ public class MainActivity extends AppCompatActivity {
     private Socket socket;
     private BufferedReader reader;
     private BufferedWriter writer;
+    int x,y;
+    int posX, posY;
+    boolean buttonPressed;
+    TCPSingleton tcp;
 
 
     @Override
@@ -37,61 +46,11 @@ public class MainActivity extends AppCompatActivity {
         btnUp = findViewById(R.id.btnUp);
         btnIzq = findViewById(R.id.btnIzq);
         btnDer = findViewById(R.id.btnDer);
-       /* btnMenu = findViewById(R.id.btnMenu);
-        btnPausa = findViewById(R.id.btnPausa);*/
-        initCliente();
-        //--------------------
-        /*btnUp.setOnClickListener(
-                (v)->{
-                    String x = coordX.getText().toString();
-                    String y = coordY.getText().toString();
-                    EnviarMensaje(x+":"+y);
 
+        tcp = TCPSingleton.getInstance();
 
-
-                }
-        );*/
     }
-    public void initCliente() {
-        new Thread(
-                ()->{
-                    try{
-                        //para solicitar la conexión
-                        Socket socket = new Socket("192.168.1.106", 5000);
 
-                        //cliente y server conectados
-                        System.out.println("Conexión exitosa");
-
-                        InputStream is = socket.getInputStream();
-                        InputStreamReader isr = new InputStreamReader(is);
-                        reader = new BufferedReader(isr);
-
-                        OutputStream os = socket.getOutputStream();
-                        OutputStreamWriter osw = new OutputStreamWriter(os);
-                        writer = new BufferedWriter(osw);
-
-                        while(true) {
-                            System.out.println("Esperando...");
-                            String line = reader.readLine();
-                            System.out.println("Recibido");
-                            System.out.println("Recibido: " + line);
-
-                           /* String[] coord = ((String) line).split (":");
-                            int x = Integer.parseInt(coord[0]);
-                            int Y = Integer.parseInt(coord[1]);
-                            PVector vector = new PVector(x,y);
-                            posiciones.add(vector);*/
-
-                        }
-
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-        ).start();
-    }
 
     public void EnviarMensaje(String msj){
         new Thread(
@@ -110,6 +69,66 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         ).start();
+
+    }
+    public boolean onTouch(View view, MotionEvent event) {
+
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                buttonPressed=true;
+                break;
+
+            case MotionEvent.ACTION_UP:
+                buttonPressed=false;
+                break;
+        }
+
+        if( buttonPressed==true){
+
+            new Thread(
+                    ()->{
+                        while (buttonPressed){
+
+                            switch (view.getId()){
+                                case R.id.btnDer:
+                                    x= x+5;
+                                    break;
+
+                                case R.id.btnIzq:
+
+                                    x= x-5;
+                                    break;
+
+                                case R.id.btnUp:
+                                    y=y-5;
+                                    break;
+                                case R.id.btnDown:
+                                    y=y+5;
+                                    break;
+                            }
+
+                            Gson gson= new Gson();
+                            Pinguino pinguino= new Pinguino(x,y);
+                            String json=gson.toJson(pinguino);
+
+                            //Envio el json
+                            //enviar(json);
+                            tcp.enviar(json);
+
+                            Log.e(">>>", json);
+
+                            try {
+                                Thread.sleep(300);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }
+            ).start();
+
+        }
+        return false;
 
     }
 
